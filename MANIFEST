@@ -5,6 +5,7 @@ maint/Makefile.include
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
+t/smells-of-vcs/.svn
 t/strictures.t
 xt/pod.t
 META.yml                                 Module meta-data (added by MakeMaker)
