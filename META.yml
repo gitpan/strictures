@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               strictures
-version:            1.002001
+version:            1.002002
 abstract:           turn on strict and make all warnings fatal
 author:
     - mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
