@@ -3,7 +3,9 @@ package strictures;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.002002'; # 1.2.2
+use constant _PERL_LT_5_8_4 => ($] < 5.008004) ? 1 : 0;
+
+our $VERSION = '1.003000'; # 1.3.0
 
 sub VERSION {
   for ($_[1]) {
@@ -19,37 +21,55 @@ sub VERSION {
   shift->SUPER::VERSION(@_);
 }
 
+my $extras_load_warned;
+
 sub import {
   strict->import;
   warnings->import(FATAL => 'all');
+
   my $extra_tests = do {
     if (exists $ENV{PERL_STRICTURES_EXTRA}) {
-      $ENV{PERL_STRICTURES_EXTRA}
-    } else {
-      !!($0 =~ /^x?t\/.*(?:load|compile|coverage|use_ok).*\.t$/
+      if (_PERL_LT_5_8_4 and $ENV{PERL_STRICTURES_EXTRA}) {
+        die 'PERL_STRICTUTRES_EXTRA checks are not available on perls older than 5.8.4, '
+          . "please unset \$ENV{PERL_STRICTURES_EXTRA}\n";
+      }
+      $ENV{PERL_STRICTURES_EXTRA};
+    } elsif (! _PERL_LT_5_8_4) {
+      !!($0 =~ /^x?t\/.*\.t$/
          and (-e '.git' or -e '.svn'))
     }
   };
   if ($extra_tests) {
-    if (eval {
-          require indirect;
-          require multidimensional;
-          require bareword::filehandles;
-          1
-        }) {
+    my @failed;
+    if (eval { require indirect; 1 }) {
       indirect->unimport(':fatal');
+    } else {
+      push @failed, 'indirect';
+    }
+    if (eval { require multidimensional; 1 }) {
       multidimensional->unimport;
+    } else {
+      push @failed, 'multidimensional';
+    }
+    if (eval { require bareword::filehandles; 1 }) {
       bareword::filehandles->unimport;
     } else {
-      die "strictures.pm extra testing active but couldn't load modules.
+      push @failed, 'bareword::filehandles';
+    }
+    if (@failed and not $extras_load_warned++) {
+      my $failed = join ' ', @failed;
+      warn <<EOE;
+strictures.pm extra testing active but couldn't load all modules. Missing were:
+
+  $failed
+
 Extra testing is auto-enabled in checkouts only, so if you're the author
 of a strictures using module you need to run:
 
   cpan indirect multidimensional bareword::filehandles
 
 but these modules are not required by your users.
-
-Error loading modules was: $@";
+EOE
     }
   }
 }
@@ -72,7 +92,7 @@ is equivalent to
 
 except when called from a file where $0 matches:
 
-  /^x?t\/.*(?:load|compile|coverage|use_ok).*\.t$/
+  /^x?t\/.*\.t$/
 
 and when either '.git' or '.svn' is present in the current directory (with
 the intention of only forcing extra tests on the author side) - or when the
@@ -92,8 +112,9 @@ Note that _EXTRA may at some point add even more tests, with only a minor
 version increase, but any changes to the effect of 'use strictures' in
 normal mode will involve a major version bump.
 
-Be aware: THIS MEANS THE EXTRA TEST MODULES ARE REQUIRED FOR AUTHORS OF
-STRICTURES USING CODE - but not by end users thereof.
+If any of the extra testing modules are not present, strictures will
+complain loudly, once, via warn(), and then shut up. But you really
+should consider installing them, they're all great anti-footgun tools.
 
 =head1 DESCRIPTION
 
@@ -114,8 +135,8 @@ syntax (and not so obvious mistakes that cause things to accidentally compile
 as such) get caught, but not at the cost of an XS dependency and not at the
 cost of blowing things up on another machine.
 
-Therefore, strictures turns on indirect checking only when it thinks it's
-running in a compilation (or pod coverage) test - though if this causes
+Therefore, strictures turns on additional checking, but only when it thinks
+it's running in a test file in a VCS checkout - though if this causes
 undesired behaviour this can be overridden by setting the
 PERL_STRICTURES_EXTRA environment variable.
 

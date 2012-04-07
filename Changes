@@ -1,3 +1,8 @@
+1.003000 - 2012-04-07
+  - try and run for any checkout t/ now we don't blow up the process
+  - defatalize lack of extra testing modules
+  - disable extra tests on perls <= 5.008003, things do not work there as
+    expected
 1.002002 - 2011-02-25
   - only try and mkdir the .git if it doesn't already exist so repeated
     test runs don't explode
