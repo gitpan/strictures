@@ -8,7 +8,7 @@ MANIFEST			This list of files
 t/smells-of-vcs/.exists
 t/smells-of-vcs/lib/one.pm
 t/smells-of-vcs/other/one.pl
-t/smells-of-vcs/t/one.t
+t/smells-of-vcs/t/one.faket
 t/strictures.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 use constant _PERL_LT_5_8_4 => ($] < 5.008004) ? 1 : 0;
 
-our $VERSION = '1.004000'; # 1.4.0
+our $VERSION = '1.004001'; # 1.4.1
 
 sub VERSION {
   for ($_[1]) {
@@ -23,6 +23,9 @@ sub VERSION {
 
 my $extras_load_warned;
 
+our $Smells_Like_VCS = (-e '.git' || -e '.svn'
+  || (-e '../../dist.ini' && (-e '../../.git' || -e '../../.svn')));
+
 sub import {
   strict->import;
   warnings->import(FATAL => 'all');
@@ -30,13 +33,13 @@ sub import {
   my $extra_tests = do {
     if (exists $ENV{PERL_STRICTURES_EXTRA}) {
       if (_PERL_LT_5_8_4 and $ENV{PERL_STRICTURES_EXTRA}) {
-        die 'PERL_STRICTUTRES_EXTRA checks are not available on perls older than 5.8.4, '
+        die 'PERL_STRICTURES_EXTRA checks are not available on perls older than 5.8.4: '
           . "please unset \$ENV{PERL_STRICTURES_EXTRA}\n";
       }
       $ENV{PERL_STRICTURES_EXTRA};
     } elsif (! _PERL_LT_5_8_4) {
       !!((caller)[1] =~ /^(?:t|xt|lib|blib)/
-         and (-e '.git' or -e '.svn'))
+         and $Smells_Like_VCS)
     }
   };
   if ($extra_tests) {
@@ -95,8 +98,10 @@ except when called from a file which matches:
   (caller)[1] =~ /^(?:t|xt|lib|blib)/
 
 and when either '.git' or '.svn' is present in the current directory (with
-the intention of only forcing extra tests on the author side) - or when the
-PERL_STRICTURES_EXTRA environment variable is set, in which case
+the intention of only forcing extra tests on the author side) - or when '.git'
+or '.svn' is present two directories up along with 'dist.ini' (which would
+indicate we are in a 'dzil test' operation, via L<Dist::Zilla>) -
+or when the PERL_STRICTURES_EXTRA environment variable is set, in which case
 
   use strictures 1;
 
