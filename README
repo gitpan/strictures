@@ -9,9 +9,9 @@ SYNOPSIS
       use strict;
       use warnings FATAL => 'all';
 
-    except when called from a file where $0 matches:
+    except when called from a file which matches:
 
-      /^x?t\/.*\.t$/
+      (caller)[1] =~ /^(?:t|xt|lib|blib)/
 
     and when either '.git' or '.svn' is present in the current directory
     (with the intention of only forcing extra tests on the author side) - or

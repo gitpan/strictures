@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 use constant _PERL_LT_5_8_4 => ($] < 5.008004) ? 1 : 0;
 
-our $VERSION = '1.003001'; # 1.3.1
+our $VERSION = '1.004000'; # 1.4.0
 
 sub VERSION {
   for ($_[1]) {
@@ -35,7 +35,7 @@ sub import {
       }
       $ENV{PERL_STRICTURES_EXTRA};
     } elsif (! _PERL_LT_5_8_4) {
-      !!($0 =~ /^x?t\/.*\.t$/
+      !!((caller)[1] =~ /^(?:t|xt|lib|blib)/
          and (-e '.git' or -e '.svn'))
     }
   };
@@ -90,9 +90,9 @@ is equivalent to
   use strict;
   use warnings FATAL => 'all';
 
-except when called from a file where $0 matches:
+except when called from a file which matches:
 
-  /^x?t\/.*\.t$/
+  (caller)[1] =~ /^(?:t|xt|lib|blib)/
 
 and when either '.git' or '.svn' is present in the current directory (with
 the intention of only forcing extra tests on the author side) - or when the
