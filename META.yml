@@ -19,5 +19,6 @@ no_index:
     - inc
 requires: {}
 resources:
+  homepage: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/strictures.git
   repository: git://git.shadowcat.co.uk/p5sagit/strictures.git
-version: 1.004001
+version: 1.004002
