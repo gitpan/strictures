@@ -3,7 +3,7 @@
    "author" : [
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
@@ -31,6 +31,11 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "bareword::filehandles" : "0",
+            "indirect" : "0",
+            "multidimensional" : "0"
+         },
          "requires" : {}
       }
    },
@@ -41,5 +46,5 @@
          "url" : "git://git.shadowcat.co.uk/p5sagit/strictures.git"
       }
    },
-   "version" : "1.004002"
+   "version" : "1.004003"
 }

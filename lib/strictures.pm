@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 use constant _PERL_LT_5_8_4 => ($] < 5.008004) ? 1 : 0;
 
-our $VERSION = '1.004002'; # 1.4.2
+our $VERSION = '1.004003'; # 1.4.3
 
 sub VERSION {
   for ($_[1]) {
@@ -21,7 +21,7 @@ sub VERSION {
   shift->SUPER::VERSION(@_);
 }
 
-my $extras_load_warned;
+my $extra_load_states;
 
 our $Smells_Like_VCS = (-e '.git' || -e '.svn'
   || (-e '../../dist.ini' && (-e '../../.git' || -e '../../.svn')));
@@ -43,37 +43,41 @@ sub import {
     }
   };
   if ($extra_tests) {
-    my @failed;
-    if (eval { require indirect; 1 }) {
-      indirect->unimport(':fatal');
-    } else {
-      push @failed, 'indirect';
-    }
-    if (eval { require multidimensional; 1 }) {
-      multidimensional->unimport;
-    } else {
-      push @failed, 'multidimensional';
-    }
-    if (eval { require bareword::filehandles; 1 }) {
-      bareword::filehandles->unimport;
-    } else {
-      push @failed, 'bareword::filehandles';
-    }
-    if (@failed and not $extras_load_warned++) {
-      my $failed = join ' ', @failed;
-      warn <<EOE;
+    $extra_load_states ||= do {
+
+      my (%rv, @failed);
+      for my $mod (qw(indirect multidimensional bareword::filehandles)) {
+        eval "require $mod; \$rv{'$mod'} = 1;" or do {
+          push @failed, $mod;
+
+          # courtesy of the 5.8 require bug
+          $mod =~ s|::|/|g;
+          delete $INC{"$mod.pm"};
+        };
+      }
+
+      if (@failed) {
+        my $failed = join ' ', @failed;
+        print STDERR <<EOE;
 strictures.pm extra testing active but couldn't load all modules. Missing were:
 
   $failed
 
 Extra testing is auto-enabled in checkouts only, so if you're the author
-of a strictures using module you need to run:
+of a strictures-using module you need to run:
 
   cpan indirect multidimensional bareword::filehandles
 
 but these modules are not required by your users.
 EOE
-    }
+      }
+
+      \%rv;
+    };
+
+    indirect->unimport(':fatal') if $extra_load_states->{indirect};
+    multidimensional->unimport if $extra_load_states->{multidimensional};
+    bareword::filehandles->unimport if $extra_load_states->{'bareword::filehandles'};
   }
 }
 
