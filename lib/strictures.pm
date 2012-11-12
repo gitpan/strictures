@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 use constant _PERL_LT_5_8_4 => ($] < 5.008004) ? 1 : 0;
 
-our $VERSION = '1.004003'; # 1.4.3
+our $VERSION = '1.004004'; # 1.4.4
 
 sub VERSION {
   for ($_[1]) {
@@ -46,13 +46,16 @@ sub import {
     $extra_load_states ||= do {
 
       my (%rv, @failed);
-      for my $mod (qw(indirect multidimensional bareword::filehandles)) {
+      foreach my $mod (qw(indirect multidimensional bareword::filehandles)) {
         eval "require $mod; \$rv{'$mod'} = 1;" or do {
           push @failed, $mod;
 
           # courtesy of the 5.8 require bug
-          $mod =~ s|::|/|g;
-          delete $INC{"$mod.pm"};
+          # (we do a copy because 5.16.2 at least uses the same read-only
+          # scalars for the qw() list and it doesn't seem worth a $^V check)
+
+          (my $file = $mod) =~ s|::|/|g;
+          delete $INC{"${file}.pm"};
         };
       }
 
