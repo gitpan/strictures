@@ -6,6 +6,9 @@ maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
 t/crash.t
+t/dep_constellations/broken/bareword/filehandles.pm
+t/dep_constellations/broken/indirect.pm
+t/dep_constellations/broken/multidimensional.pm
 t/smells-of-vcs/.exists
 t/smells-of-vcs/lib/one.pm
 t/smells-of-vcs/other/one.pl

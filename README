@@ -13,12 +13,12 @@ SYNOPSIS
 
       (caller)[1] =~ /^(?:t|xt|lib|blib)/
 
-    and when either ".git" or ".svn" is present in the current directory
-    (with the intention of only forcing extra tests on the author side) --
-    or when ".git" or ".svn" is present two directories up along with
-    "dist.ini" (which would indicate we are in a "dzil test" operation, via
-    Dist::Zilla) -- or when the "PERL_STRICTURES_EXTRA" environment variable
-    is set, in which case
+    and when either ".git", ".svn", or ".hg" is present in the current
+    directory (with the intention of only forcing extra tests on the author
+    side) -- or when ".git", ".svn", or ".hg" is present two directories up
+    along with "dist.ini" (which would indicate we are in a "dzil test"
+    operation, via Dist::Zilla) -- or when the "PERL_STRICTURES_EXTRA"
+    environment variable is set, in which case
 
       use strictures 1;
 
@@ -139,6 +139,13 @@ EXTRA TESTING RATIONALE
     discussion on the subject to focus on "how do we minimise annoyance to
     people deploying from checkouts intentionally".
 
+SEE ALSO
+    *   indirect
+
+    *   multidimensional
+
+    *   bareword::filehandles
+
 COMMUNITY AND SUPPORT
   IRC channel
     irc.perl.org #toolchain
@@ -158,7 +165,11 @@ AUTHOR
     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
 
 CONTRIBUTORS
-    None required yet. Maybe this module is perfect (hahahahaha ...).
+    Karen Etheridge (cpan:ETHER) <ether@cpan.org>
+
+    Mithaldu - Christian Walde (cpan:MITHALDU) <walde.christian@gmail.com>
+
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
 
 COPYRIGHT
     Copyright (c) 2010 the strictures "AUTHOR" and "CONTRIBUTORS" as listed

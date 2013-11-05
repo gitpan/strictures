@@ -3,9 +3,11 @@ package strictures;
 use strict;
 use warnings FATAL => 'all';
 
-use constant _PERL_LT_5_8_4 => ($] < 5.008004) ? 1 : 0;
+BEGIN {
+  *_PERL_LT_5_8_4 = ($] < 5.008004) ? sub(){1} : sub(){0};
+}
 
-our $VERSION = '1.004004'; # 1.4.4
+our $VERSION = '1.005000'; # 1.5.0
 
 sub VERSION {
   for ($_[1]) {
@@ -21,10 +23,11 @@ sub VERSION {
   shift->SUPER::VERSION(@_);
 }
 
-my $extra_load_states;
+our $extra_load_states;
 
-our $Smells_Like_VCS = (-e '.git' || -e '.svn'
-  || (-e '../../dist.ini' && (-e '../../.git' || -e '../../.svn')));
+our $Smells_Like_VCS = (-e '.git' || -e '.svn' || -e '.hg'
+  || (-e '../../dist.ini'
+      && (-e '../../.git' || -e '../../.svn' || -e '../../.hg' )));
 
 sub import {
   strict->import;
@@ -104,9 +107,9 @@ except when called from a file which matches:
 
   (caller)[1] =~ /^(?:t|xt|lib|blib)/
 
-and when either C<.git> or C<.svn> is present in the current directory (with
-the intention of only forcing extra tests on the author side) -- or when C<.git>
-or C<.svn> is present two directories up along with C<dist.ini> (which would
+and when either C<.git>, C<.svn>, or C<.hg> is present in the current directory (with
+the intention of only forcing extra tests on the author side) -- or when C<.git>,
+C<.svn>, or C<.hg> is present two directories up along with C<dist.ini> (which would
 indicate we are in a C<dzil test> operation, via L<Dist::Zilla>) --
 or when the C<PERL_STRICTURES_EXTRA> environment variable is set, in which case
 
@@ -232,6 +235,24 @@ desirable from a point of view of providing new users with as much safety as pos
 and will allow any future discussion on the subject to focus on "how do we
 minimise annoyance to people deploying from checkouts intentionally".
 
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<indirect>
+
+=item *
+
+L<multidimensional>
+
+=item *
+
+L<bareword::filehandles>
+
+=back
+
 =head1 COMMUNITY AND SUPPORT
 
 =head2 IRC channel
@@ -256,7 +277,11 @@ mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
 
 =head1 CONTRIBUTORS
 
-None required yet. Maybe this module is perfect (hahahahaha ...).
+Karen Etheridge (cpan:ETHER) <ether@cpan.org>
+
+Mithaldu - Christian Walde (cpan:MITHALDU) <walde.christian@gmail.com>
+
+haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
 
 =head1 COPYRIGHT
 
