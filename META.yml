@@ -24,4 +24,4 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=strictures
   repository: git://git.shadowcat.co.uk/p5sagit/strictures.git
-version: 1.005000
+version: 1.005001
