@@ -4,6 +4,15 @@ use ExtUtils::MakeMaker;
 
 (do 'maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
 
+my %extra_prereqs = (
+  indirect => 0,
+  multidimensional => 0,
+  'bareword::filehandles' => 0,
+);
+my $have_compiler
+  = eval { require ExtUtils::CBuilder; 1 }
+  && ExtUtils::CBuilder->new->have_compiler;
+
 WriteMakefile(
   NAME => 'strictures',
   VERSION_FROM => 'lib/strictures.pm',
@@ -11,7 +20,7 @@ WriteMakefile(
 
   META_MERGE => {
     'meta-spec' => { version => 2 },
-    dynamic_config => 0,
+    dynamic_config => 1,
 
     resources => {
       # r/w: p5sagit@git.shadowcat.co.uk:strictures.git
@@ -27,13 +36,18 @@ WriteMakefile(
     },
 
     prereqs => {
-      runtime => {
-        recommends => {
-          indirect => 0,
-          multidimensional => 0,
-          'bareword::filehandles' => 0,
+      configure => {
+        requires => {
+          'ExtUtils::CBuilder' => 0,
         },
+      },
+      runtime => {
+        ( $] >= 5.008004 && !$have_compiler
+          ? ( recommends => \%extra_prereqs ) : () ),
       },
     },
   },
+
+  ($] >= 5.008004 && $have_compiler
+    ? ( PREREQ_PM => \%extra_prereqs ) : () ),
 );
