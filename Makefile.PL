@@ -23,7 +23,9 @@ my %META = (
       'Test::More' => 0,
     } },
     runtime => {
-      requires => { },
+      requires => {
+        perl => '5.006',
+      },
       recommends => {
         %extra_prereqs,
       },
@@ -54,6 +56,7 @@ my %MM_ARGS = (
   PREREQ_PM => {
     ($] >= 5.008004 && $have_compiler ? %extra_prereqs : () )
   },
+  realclean => { FILES => [ 'Distar/', 'MANIFEST*' ] },
 );
 
 sub parse_args {
@@ -89,7 +92,7 @@ $MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
 for (qw(configure build test runtime)) {
   my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';
   my $r = $MM_ARGS{$key} = {
-    %{$META{prereqs}{$_}{requires}},
+    %{$META{prereqs}{$_}{requires} || {}},
     %{delete $MM_ARGS{$key} || {}},
   };
   defined $r->{$_} or delete $r->{$_} for keys %$r;
